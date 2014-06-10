@@ -21,7 +21,7 @@ The first application in which it is used is OpenERP.
 
 The easiest way to install chronopost_api:
 
-    pip install git@github.com:florian-dacosta/chronopost.git
+    pip install git+https://github.com/florian-dacosta/chronopost.git
 
 
 
