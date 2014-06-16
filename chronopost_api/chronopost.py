@@ -124,13 +124,9 @@ class Chronopost(AbstractLabel):
             res['errors'] = [e[0]]
         except Exception as e:
             # if authentification error
-            if isinstance(e[0], tuple) and e[0][0] == 401:
-                raise orm.except_orm(
-                    _('Error 401'),
-                    _('Authorization Required\n\n'
-                      'Please verify postlogistics username and password in:\n'
-                      'Configuration -> Postlogistics'))
-            raise
+            #if isinstance(e[0], tuple) and e[0][0] == 401:
+                #raise e[0][0]
+            raise e
         return res
 
 
