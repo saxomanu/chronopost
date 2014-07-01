@@ -64,7 +64,7 @@ ADDRESS_MODEL = {
     "phone":        {'max_size': 17},
     "mobile":       {'max_size': 17},
     "email":        {'max_size': 80},
-    "alert":        {'type': int}, #FIXME
+    "alert":        {}, #FIXME
 }
 
 
@@ -293,26 +293,22 @@ class Chronopost(AbstractLabel):
                  password, esd=None, mode=False, customer = None):
         """
         Call Chronopost 'shipping' web service and return the label in binary.
-        Params TO DO
-        :param int/long profile_id: ID of the profile used to import the file
-        :param filebuffer file_stream: binary of the providen file
-        :param char: ftype represent the file exstension (csv by default)
-        :return: ID of the created account.bank.statemênt
+        Params TODO
         """
         if not customer:
             customer = shipper.copy()
-        header_obj = self._prepare_header(header)
-        recipient_obj = self._prepare_address(recipient, 'recipient')
-        shipper_obj = self._prepare_address(shipper, 'shipper')
-        customer_obj = self._prepare_address(customer, 'customer')
+        header_obj = self._prepare_header(header.copy())
+        recipient_obj = self._prepare_address(recipient.copy(), 'recipient')
+        shipper_obj = self._prepare_address(shipper.copy(), 'shipper')
+        customer_obj = self._prepare_address(customer.copy(), 'customer')
 
         if esd:
-            esd_obj = self._prepare_esd(esd)
+            esd_obj = self._prepare_esd(esd.copy())
         else:   
             esd_obj = self._client.factory.create('esdValue')
 
-        ref_obj = self._prepare_ref(ref)
-        skybill_obj = self._prepare_skybill(skybill)
+        ref_obj = self._prepare_ref(ref.copy())
+        skybill_obj = self._prepare_skybill(skybill.copy())
 
         password = self._check_password(password)
         if mode:
