@@ -64,7 +64,7 @@ ADDRESS_MODEL = {
     "phone":        {'max_size': 17},
     "mobile":       {'max_size': 17},
     "email":        {'max_size': 80},
-    "alert":        {'type': int}, #FIXME
+    "alert":        {}, #FIXME
 }
 
 
