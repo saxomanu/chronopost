@@ -283,7 +283,7 @@ class Chronopost(AbstractLabel):
         header = self._client.factory.create('headerValue')
         header['idEmit'] = 'CHRFR'
         header['accountNumber'] = vals['accountNumber']
-        if vals.get('subaccount', False):
+        if vals.get('subAccount', False):
             self._check_account(vals['subAccount'])
             header['subAccount'] = vals['subAccount']
         return header
