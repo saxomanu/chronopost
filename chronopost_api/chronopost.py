@@ -31,7 +31,7 @@ from .exception_helper import (
 )
 
 
-WEBSERVICE_URL = 'https://www.chronopost.fr/shipping-cxf/ShippingServiceWS?wsdl'
+WEBSERVICE_URL = 'https://ws.chronopost.fr/shipping-cxf/ShippingServiceWS?wsdl'
 
 ESD_MODEL = {
     "retrievalDateTime":         {'max_size': 17},
