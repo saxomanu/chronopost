@@ -185,7 +185,7 @@ class Chronopost(AbstractLabel):
         customer_model = ADDRESS_MODEL.copy()
         customer_model['civility'] = {'in': ['E', 'L', 'M'], 'required': True}
         customer_model['print_as_sender'] = {'in': ['Y', 'N']}
-        print "****", address, "***"
+        print("****", address, "***")
         self.check_model(address, customer_model, 'address')
         elements = {
             'customerCivility': 'civility',
@@ -233,7 +233,7 @@ class Chronopost(AbstractLabel):
 
 
     def _prepare_recipient_address(self, address):
-        print "address", address
+        print("address", address)
         self.check_model(address, ADDRESS_MODEL, 'address')
         elements = {
             'recipientName': 'name',
@@ -262,7 +262,7 @@ class Chronopost(AbstractLabel):
         if info_type == 'customer':
             obj, elements = self._prepare_customer_address(values)
         if obj and elements and values:
-            for elm, elm_v in elements.items():
+            for elm, elm_v in list(elements.items()):
                 obj[elm] = ''
                 if elm_v in values:
                     obj[elm] = values[elm_v]

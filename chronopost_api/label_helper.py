@@ -63,23 +63,23 @@ class AbstractLabel(object):
         """
         if model_name:
             model_name = '(model: ' + model_name + ')'
-        for field, definition in model.items():
+        for field, definition in list(model.items()):
             #check type before all other checks if requested in model
             if 'type' in definition and field in datas:
                 self.check_type(field, [definition['type']], datas[field])
             to_check = self.must_be_checked(datas, field)
-            for key, val in definition.items():
+            for key, val in list(definition.items()):
                 if to_check:
                     data = datas[field]
                     size = self.evaluate_size_according_to_type(data)
                     if key == 'max_size':
-                        self.check_type(field, [str, unicode], data)
+                        self.check_type(field, [str, str], data)
                         if size > val:
                             raise InvalidSize(
                                 "Max size for field '%s' is "
                                 "%s :  %s given" % (field, val, size))
                     elif key == 'min_size':
-                        self.check_type(field, [str, unicode], data)
+                        self.check_type(field, [str, str], data)
                         if size < val:
                             raise InvalidSize(
                                 "Min size for field '%s' is "
@@ -146,7 +146,7 @@ class AbstractLabel(object):
         #if field == 'street2':
         #    import pdb;pdb.set_trace()
         if field in datas:
-            if type(datas[field]) in [str, unicode, bool]:
+            if type(datas[field]) in [str, str, bool]:
                 if datas[field] is False:
                     res = False
         else:
@@ -156,7 +156,7 @@ class AbstractLabel(object):
     def evaluate_size_according_to_type(self, data):
         "Used to simplify the code in check_model()"
         res = ''
-        if type(data) in [str, unicode]:
+        if type(data) in [str, str]:
             res = len(data)
         elif type(data) in [int, float]:
             res = data
