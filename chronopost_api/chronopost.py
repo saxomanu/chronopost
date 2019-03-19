@@ -10,8 +10,6 @@ with the right arguments. To know which keys to send to this method read these l
 
 """
 
-
-
 from datetime import datetime
 import re
 from suds.client import Client, WebFault
@@ -64,7 +62,7 @@ ADDRESS_MODEL = {
     "phone":        {'max_size': 17},
     "mobile":       {'max_size': 17},
     "email":        {'max_size': 80},
-    "alert":        {}, #FIXME
+    "alert":        {},  # FIXME
 }
 
 
@@ -88,6 +86,8 @@ SKYBILL_MODEL = {
     "customsCurrency":   {'max_size': 80},
     "service":           {'max_size': 1},
     "objectType":        {'max_size': 80},
+    "skybillRank":       {'max_size': 80},
+    "bulkNumber":        {'max_size': 80},
     "content1":          {'max_size': 80},
     "content2":          {'max_size': 80},
     "content3":          {'max_size': 80},
@@ -103,10 +103,8 @@ def is_digit(s):
 class Chronopost(AbstractLabel):
     _client = None
 
-
     def __init__(self):
         self._client = Client(WEBSERVICE_URL)
-
 
     def _send_request(self, request, *args):
         """ Wrapper for API requests
@@ -123,12 +121,8 @@ class Chronopost(AbstractLabel):
             res['success'] = False
             res['errors'] = [e[0]]
         except Exception as e:
-            # if authentification error
-            #if isinstance(e[0], tuple) and e[0][0] == 401:
-                #raise e[0][0]
             raise e
         return res
-
 
     def _prepare_skybillparams(self, mode):
         skybillparams_obj = self._client.factory.create('skybillParamsValue')
@@ -140,46 +134,30 @@ class Chronopost(AbstractLabel):
                 "The printing mode must be in %s" % valid_values)
         return skybillparams_obj
 
-
     def _check_password(self, password):
         if is_digit(password) is False:
             raise InvalidType(
-                "Only digit chars are authorised for 'account' '%s'"
-                % account)
+                "Only digit chars are authorised")
         if len(str(password)) != 6:
             raise InvalidSize(
                 "The password have to contain 6 characters")
         return password
 
-
     def _prepare_skybill(self, info):
         self.check_model(info, SKYBILL_MODEL, 'skybill')
-        skybill_obj = self._client.factory.create('skybillValue')
-        #for key in info.keys():
-         #  skybill_obj[key] = info[key] 
         skybill_obj = info.copy()
         skybill_obj['evtCode'] = 'DC'
         return skybill_obj
 
-
     def _prepare_ref(self, info):
         self.check_model(info, REF_MODEL, 'ref')
-        ref_obj = self._client.factory.create('refValue')
-        #for key in info.keys():
-         #  ref_obj[key] = info[key] 
         ref_obj = info.copy()
         return ref_obj
 
-
     def _prepare_esd(self, info):
         self.check_model(info, ESD_MODEL, 'esd')
-        esd_obj = self._client.factory.create('esdValue')
-        #esd_obj['retrievalDateTime'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
-        #esd_obj['closingDateTime'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
         esd_obj = info.copy()
         return esd_obj
-
-
 
     def _prepare_customer_address(self, address):
         customer_model = ADDRESS_MODEL.copy()
@@ -207,7 +185,6 @@ class Chronopost(AbstractLabel):
         customer = self._client.factory.create('customerValue')
         return customer, elements
 
-
     def _prepare_shipper_address(self, address):
         shipper_model = ADDRESS_MODEL.copy()
         shipper_model['civility'] = {'in': ['E', 'L', 'M'], 'required': True}
@@ -231,7 +208,6 @@ class Chronopost(AbstractLabel):
         shipper = self._client.factory.create('shipperValue')
         return shipper, elements
 
-
     def _prepare_recipient_address(self, address):
         print "address", address
         self.check_model(address, ADDRESS_MODEL, 'address')
@@ -253,7 +229,6 @@ class Chronopost(AbstractLabel):
         recipient = self._client.factory.create('recipientValue')
         return recipient, elements
 
-
     def _prepare_address(self, values, info_type):
         if info_type == 'recipient':
             obj, elements = self._prepare_recipient_address(values)
@@ -268,14 +243,12 @@ class Chronopost(AbstractLabel):
                     obj[elm] = values[elm_v]
         return obj
 
-
     def _check_account(self, account):
         if is_digit(account) is False:
             raise InvalidType(
                 "Only digit chars are authorised for 'account' '%s'"
                 % account)
         return account
-
 
     def _prepare_header(self, vals):
         self.check_model(vals, HEADER_MODEL, 'header')
@@ -288,9 +261,8 @@ class Chronopost(AbstractLabel):
             header['subAccount'] = vals['subAccount']
         return header
 
-
     def get_shipping_label(self, recipient, shipper, header, ref, skybill,
-                 password, esd=None, mode=False, customer = None):
+                           password, esd=None, mode=False, customer=None):
         """
         Call Chronopost 'shipping' web service and return the label in binary.
         Params TODO
@@ -304,7 +276,7 @@ class Chronopost(AbstractLabel):
 
         if esd:
             esd_obj = self._prepare_esd(esd.copy())
-        else:   
+        else:
             esd_obj = self._client.factory.create('esdValue')
 
         ref_obj = self._prepare_ref(ref.copy())
@@ -315,12 +287,8 @@ class Chronopost(AbstractLabel):
             skybillparams_obj = self._prepare_skybillparams(mode)
         else:
             skybillparams_obj = self._client.factory.create('skybillParamsValue')
-        #test = self._client.service.shipping(esd, head, shiping, customer, recipient, ref, sky, bill, '255562')
         request = self._client.service.shipping
         response = self._send_request(request, esd_obj, header_obj, shipper_obj,
-                                      customer_obj, recipient_obj, ref_obj, 
+                                      customer_obj, recipient_obj, ref_obj,
                                       skybill_obj, skybillparams_obj, password)
         return response
-
-
-
