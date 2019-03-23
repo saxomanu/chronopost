@@ -30,6 +30,7 @@ from .exception_helper import (
 
 
 WEBSERVICE_URL = 'https://ws.chronopost.fr/shipping-cxf/ShippingServiceWS?wsdl'
+WEBSERVICE_CANCEL_URL = 'https://www.chronopost.fr/tracking-cxf/TrackingServiceWS?wsdl'
 
 ESD_MODEL = {
     "retrievalDateTime":         {'max_size': 17},
@@ -103,8 +104,11 @@ def is_digit(s):
 class Chronopost(AbstractLabel):
     _client = None
 
-    def __init__(self):
-        self._client = Client(WEBSERVICE_URL)
+    def __init__(self, service='label'):
+        if service == 'label':
+            self._client = Client(WEBSERVICE_URL)
+        elif service == 'cancel':
+            self._client = Client(WEBSERVICE_CANCEL_URL)
 
     def _send_request(self, request, *args):
         """ Wrapper for API requests
@@ -292,3 +296,10 @@ class Chronopost(AbstractLabel):
                                       customer_obj, recipient_obj, ref_obj,
                                       skybill_obj, skybillparams_obj, password)
         return response
+
+    def cancel_label(self, accountNumber, password, skybillNumber):
+        request = self._client.service.cancelSkybill
+        language = 'fr_FR'
+        response = self._send_request(request, accountNumber, password, language, skybillNumber)
+        return response
+    
